@@ -1,0 +1,239 @@
+{
+	"version": 6,
+	"cmakeMinimumRequired": {
+		"major": 3,
+		"minor": 25,
+		"patch": 0
+	},
+	"configurePresets": [
+		{
+			"name": "layout-ci",
+			"hidden": true,
+			"binaryDir": "${sourceDir}/build",
+			"installDir": "${sourceDir}/install"
+		},
+		{
+			"name": "generator-ninja-multi-config-ci",
+			"hidden": true,
+			"generator": "Ninja Multi-Config",
+			"cacheVariables": {
+				"CMAKE_MAKE_PROGRAM": {
+					"type": "FILEPATH",
+					"value": "ninja"
+				}
+			}
+		},
+		{
+			"name": "toolchain-makefiles-c++-gcc-ci-linux",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_CXX_COMPILER": {
+					"type": "FILEPATH",
+					"value": "g++"
+				}
+			}
+		},
+		{
+			"name": "gcc-c++-strict-iso-high-warn-ci",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_CXX_FLAGS": "-pedantic -Wall -Wextra -Werror"
+			}
+		},
+		{
+			"name": "ninja-mc-ci-linux",
+			"displayName": "Ninja Multi-Config & GCC",
+			"inherits": [
+				"layout-ci",
+				"generator-ninja-multi-config-ci",
+				"toolchain-makefiles-c++-gcc-ci-linux",
+				"gcc-c++-strict-iso-high-warn-ci"
+			],
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			},
+			"errors": {
+				"dev": true
+			},
+			"cacheVariables": {
+				"CPACK_SOURCE_GENERATOR": "TGZ;DEB",
+				"CPACK_GENERATOR": "TGZ;DEB"
+			}
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "ninja-mc-ci-linux-debug",
+			"displayName": "Debug",
+			"configuration": "Debug",
+			"configurePreset": "ninja-mc-ci-linux"
+		},
+		{
+			"name": "ninja-mc-ci-linux-release",
+			"displayName": "Release",
+			"configuration": "Release",
+			"configurePreset": "ninja-mc-ci-linux"
+		},
+		{
+			"name": "ninja-mc-ci-linux-debug-install",
+			"displayName": "Debug",
+			"configuration": "Debug",
+			"configurePreset": "ninja-mc-ci-linux",
+			"targets": [
+				"install"
+			]
+		},
+		{
+			"name": "ninja-mc-ci-linux-release-install",
+			"displayName": "Release",
+			"configuration": "Release",
+			"configurePreset": "ninja-mc-ci-linux",
+			"targets": [
+				"install"
+			]
+		}
+	],
+	"testPresets": [
+		{
+			"name": "execution-behavior-ci",
+			"hidden": true,
+			"execution": {
+				"noTestsAction": "error",
+				"stopOnFailure": true,
+				"jobs": 4
+			},
+			"output": {
+				"outputOnFailure": true
+			}
+		},
+		{
+			"name": "ninja-mc-ci-linux-debug",
+			"displayName": "Debug",
+			"configuration": "Debug",
+			"configurePreset": "ninja-mc-ci-linux",
+			"inherits": [
+				"execution-behavior-ci"
+			]
+		},
+		{
+			"name": "ninja-mc-ci-linux-release",
+			"displayName": "Release",
+			"configuration": "Release",
+			"configurePreset": "ninja-mc-ci-linux",
+			"inherits": [
+				"execution-behavior-ci"
+			]
+		}
+	],
+	"packagePresets": [
+		{
+			"name": "ninja-mc-ci-linux-source-tgz",
+			"displayName": "Source (TGZ)",
+			"configurePreset": "ninja-mc-ci-linux",
+			"configurations": [
+				"Release"
+			],
+			"generators": [
+				"TGZ"
+			],
+			"variables": {
+				"CPACK_PACKAGING_INSTALL_PREFIX": ""
+			},
+			"configFile": "${sourceDir}/build/CPackSourceConfig.cmake",
+			"packageDirectory": "${sourceDir}/package"
+		},
+		{
+			"name": "ninja-mc-ci-linux-binary-deb",
+			"displayName": "Binary (DEB)",
+			"configurePreset": "ninja-mc-ci-linux",
+			"configurations": [
+				"Release"
+			],
+			"generators": [
+				"DEB"
+			],
+			"variables": {
+				"CPACK_PACKAGING_INSTALL_PREFIX": "/usr"
+			},
+			"configFile": "${sourceDir}/build/CPackConfig.cmake",
+			"packageDirectory": "${sourceDir}/package"
+		},
+		{
+			"name": "ninja-mc-ci-linux-source-deb",
+			"displayName": "Source (DEB)",
+			"configurePreset": "ninja-mc-ci-linux",
+			"configurations": [
+				"Release"
+			],
+			"generators": [
+				"DEB"
+			],
+			"variables": {
+				"CPACK_SOURCE_INSTALLED_DIRECTORIES": "${sourceDir};/usr/src/libuseful",
+				"CPACK_CUSTOM_INSTALL_VARIABLES": "CPACK_SOURCE_INSTALLED_DIRECTORIES=${sourceDir};/usr/src/libuseful"
+			},
+			"configFile": "${sourceDir}/build/CPackSourceConfig.cmake",
+			"packageDirectory": "${sourceDir}/package"
+		},
+		{
+			"name": "ninja-mc-ci-linux-source-deb-tgz",
+			"displayName": "Source (DEB;TGZ)",
+			"configurePreset": "ninja-mc-ci-linux",
+			"configurations": [
+				"Release"
+			],
+			"generators": [
+				"DEB",
+				"TGZ"
+			],
+			"configFile": "${sourceDir}/build/CPackSourceConfig.cmake",
+			"packageDirectory": "${sourceDir}/package"
+		}
+	],
+	"workflowPresets": [
+		{
+			"name": "ninja-mc-ci-linux",
+			"displayName": "Ninja Multi-Config & GCC",
+			"steps": [
+				{
+					"type": "configure",
+					"name": "ninja-mc-ci-linux"
+				},
+				{
+					"type": "build",
+					"name": "ninja-mc-ci-linux-release"
+				},
+				{
+					"type": "build",
+					"name": "ninja-mc-ci-linux-debug"
+				},
+				{
+					"type": "test",
+					"name": "ninja-mc-ci-linux-release"
+				},
+				{
+					"type": "test",
+					"name": "ninja-mc-ci-linux-debug"
+				},
+				{
+					"type": "build",
+					"name": "ninja-mc-ci-linux-release-install"
+				},
+				{
+					"type": "package",
+					"name": "ninja-mc-ci-linux-binary-deb"
+				},
+				{
+					"type": "package",
+					"name": "ninja-mc-ci-linux-source-deb"
+				},
+				{
+					"type": "package",
+					"name": "ninja-mc-ci-linux-source-tgz"
+				}
+			]
+		}
+	]
+}
