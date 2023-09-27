@@ -1,13 +1,11 @@
-#if(NOT CPACK_PACKAGING_INSTALL_PREFIX)
-#	set(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
-#endif()
-
 # Back-end agnostic metadata
 set(CPACK_PACKAGE_VENDOR "Fellowship Inc.")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 
 set(CPACK_SOURCE_IGNORE_FILES [[/\\.git/;/\\.gitignore;/\\.vscode/;/\\.vs/;/build/;/install/;/package/]])
+
+set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_SOURCE_DIR}/cmake/ProjectOwnerPackageConfig.cmake")
 
 ##########################################################
 #                      DEB packaging                     #
@@ -83,14 +81,5 @@ set(CPACK_DEBIAN_DOCUMENTATION_DESCRIPTION "Long-winded description to show in `
 
 set(CPACK_DEBIAN_PACKAGE_NAME "libuseful-src")
 set(CPACK_DEBIAN_FILE_NAME "${CPACK_DEBIAN_PACKAGE_NAME}_${PACKAGE_VERSION_REVISION}.deb")
-
-# Only one that seems to have an effect, but effects both TGZ and DEB
-set(CPACK_SOURCE_INSTALLED_DIRECTORIES "${PROJECT_SOURCE_DIR};/usr/src/libuseful")
-
-# Don't properly apply to the different generators
-#set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_SOURCE_DIR}/cmake/ProjectOwnerPackageConfig.cmake")
-#set(CPACK_PROPERTIES_FILE "/home/mate/Source/Test-Packaging/cmake/ProjectOwnerPackageConfig.cmake")
-
-#set(CPACK_DEBIAN_PACKAGE_DEBUG ON)
 
 include(CPack)

@@ -13,6 +13,14 @@
 			"installDir": "${sourceDir}/install"
 		},
 		{
+			"name": "packaging-ci",
+			"hidden": true,
+			"cacheVariables": {
+				"CPACK_SOURCE_GENERATOR": "TGZ;DEB",
+				"CPACK_GENERATOR": "TGZ;DEB"
+			}
+		},
+		{
 			"name": "generator-ninja-multi-config-ci",
 			"hidden": true,
 			"generator": "Ninja Multi-Config",
@@ -45,6 +53,7 @@
 			"displayName": "Ninja Multi-Config & GCC",
 			"inherits": [
 				"layout-ci",
+				"packaging-ci",
 				"generator-ninja-multi-config-ci",
 				"toolchain-makefiles-c++-gcc-ci-linux",
 				"gcc-c++-strict-iso-high-warn-ci"
@@ -56,10 +65,6 @@
 			},
 			"errors": {
 				"dev": true
-			},
-			"cacheVariables": {
-				"CPACK_SOURCE_GENERATOR": "TGZ;DEB",
-				"CPACK_GENERATOR": "TGZ;DEB"
 			}
 		}
 	],
@@ -129,22 +134,6 @@
 	],
 	"packagePresets": [
 		{
-			"name": "ninja-mc-ci-linux-source-tgz",
-			"displayName": "Source (TGZ)",
-			"configurePreset": "ninja-mc-ci-linux",
-			"configurations": [
-				"Release"
-			],
-			"generators": [
-				"TGZ"
-			],
-			"variables": {
-				"CPACK_PACKAGING_INSTALL_PREFIX": ""
-			},
-			"configFile": "${sourceDir}/build/CPackSourceConfig.cmake",
-			"packageDirectory": "${sourceDir}/package"
-		},
-		{
 			"name": "ninja-mc-ci-linux-binary-deb",
 			"displayName": "Binary (DEB)",
 			"configurePreset": "ninja-mc-ci-linux",
@@ -171,23 +160,25 @@
 				"DEB"
 			],
 			"variables": {
-				"CPACK_SOURCE_INSTALLED_DIRECTORIES": "${sourceDir};/usr/src/libuseful",
-				"CPACK_CUSTOM_INSTALL_VARIABLES": "CPACK_SOURCE_INSTALLED_DIRECTORIES=${sourceDir};/usr/src/libuseful"
+				"CPACK_INSTALLED_DIRECTORIES": "${sourceDir};/usr/src/libuseful",
+				"CPACK_SOURCE_INSTALLED_DIRECTORIES": "${sourceDir};/usr/src/libuseful"
 			},
 			"configFile": "${sourceDir}/build/CPackSourceConfig.cmake",
 			"packageDirectory": "${sourceDir}/package"
 		},
 		{
-			"name": "ninja-mc-ci-linux-source-deb-tgz",
-			"displayName": "Source (DEB;TGZ)",
+			"name": "ninja-mc-ci-linux-source-tgz",
+			"displayName": "Source (TGZ)",
 			"configurePreset": "ninja-mc-ci-linux",
 			"configurations": [
 				"Release"
 			],
 			"generators": [
-				"DEB",
 				"TGZ"
 			],
+			"variables": {
+				"CPACK_PACKAGING_INSTALL_PREFIX": ""
+			},
 			"configFile": "${sourceDir}/build/CPackSourceConfig.cmake",
 			"packageDirectory": "${sourceDir}/package"
 		}
