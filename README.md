@@ -48,7 +48,26 @@ To allow invoking the entire process as a oneliner, CMake presets allows assembl
 | Workflow     | `cmake --workflow <name>` |
 
 This way CI and developers using any IDE can invoke the entire process as a one-liner or invoke individual steps from
-any command-line or using integrations provided by IDEs.
+any command-line or using integrations provided by IDEs. For more on presets, refer to the
+[relevant docs](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html).
+
+#### CI/CD versus development
+
+Should users have an environment which differs from that of CI, or they simply want to develop using consciously chosen
+differing CMake invocations (lacking resources to build all GPU device targets regularly in their dev loop, using
+out-of-band compilers which don't build cleanly with
+[`COMPILE_WARNING_AS_ERROR`](https://cmake.org/cmake/help/latest/prop_tgt/COMPILE_WARNING_AS_ERROR.html), etc.), they
+can define their own presets. CMake will look for a `CMakePresets.json` file in the project root, which is owned by the
+project, should be commited to version control and should reflect invocations used in CI/CD known to work in
+environments used in CI/CD, and it will be merged with another file next to it `CMakeUserPrests.json`. This latter
+should regularly be ignored by version control. It also implicitly includes the project's presets, so if only a few
+deltas are needed, the majority of the JSON need not be copied over.
+
+In that spirit, projects should:
+
+- not include files in `CMakePresets.json` which are absent from the repo itself.
+- try to define your presets using multiple groups of orthogonal settings (`hidden: true`) presets which the user can
+  individually override without having to rehash all the commonality they agree with.
 
 **Shortcomings**
 
