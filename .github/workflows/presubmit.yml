@@ -18,7 +18,7 @@ jobs:
     - name: Git clone repository
       uses: actions/checkout@v3
 
-    - name: Configure
+    - name: Run CMake workflow preset
       run: cmake --workflow --preset ninja-mc-ci-linux
 
   windows:
@@ -36,5 +36,5 @@ jobs:
     - name: Git clone repository
       uses: actions/checkout@v3
 
-    - name: Configure
+    - name: Run CMake workflow preset
       run: cmake --workflow --preset msbuild-ci-windows
