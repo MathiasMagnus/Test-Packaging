@@ -1,89 +1,22 @@
 # Back-end agnostic metadata
 set(CPACK_PACKAGE_VENDOR "Fellowship Inc.")
+
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
-
-set(CPACK_SOURCE_IGNORE_FILES [[/\\.git/;/\\.gitignore;/\\.vscode/;/\\.vs/;/build/;/install/;/package/]])
-
-set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_SOURCE_DIR}/cmake/ProjectOwnerPackageConfig.cmake")
-
-##########################################################
-#                      DEB packaging                     #
-##########################################################
-
-# DEB packaging configuration
-set(CPACK_DEB_COMPONENT_INSTALL ON)           # Enable DEB packages making use of install(COMPONENT)
-set(CPACK_DEBIAN_ENABLE_COMPONENT_DEPENDS ON) # Component dependencies are reflected in package relationships
-
-# Get architecture
-find_program(DPKG_EXE dpkg REQUIRED)
-execute_process(
-	COMMAND "${DPKG_EXE}" "--print-architecture"
-	OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE
-	OUTPUT_STRIP_TRAILING_WHITESPACE
-	COMMAND_ERROR_IS_FATAL ANY
-)
-
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER "${CPACK_PACKAGE_VENDOR}")
-set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/MathiasMagnus/Useful")
-
-# Version number [epoch:]upstream_version[-debian_revision]
-set(CPACK_DEBIAN_PACKAGE_VERSION "${PROJECT_VERSION}") # upstream_version
-if(DEFINED LATEST_RELEASE_VERSION)
-	# Remove leading "v", if exists
-	string(LENGTH "${LATEST_RELEASE_VERSION}" LATEST_RELEASE_VERSION_LENGTH)
-	string(SUBSTRING "${LATEST_RELEASE_VERSION}" 0 1 LATEST_RELEASE_VERSION_FRONT)
-	if(LATEST_RELEASE_VERSION_FRONT STREQUAL "v")
-		string(SUBSTRING "${LATEST_RELEASE_VERSION}" 1 ${LATEST_RELEASE_VERSION_LENGTH} LATEST_RELEASE_VERSION)
-	endif()
-	string(APPEND CPACK_DEBIAN_PACKAGE_VERSION "~${LATEST_RELEASE_VERSION}")
-endif()
-set(CPACK_DEBIAN_PACKAGE_RELEASE "1") # debian_revision (because this is a non-native pkg)
-set(PACKAGE_VERSION_REVISION "${CPACK_DEBIAN_PACKAGE_VERSION}-${CPACK_DEBIAN_PACKAGE_RELEASE}${DEBIAN_VERSION_SUFFIX}")
-# Package file name in deb format: <PackageName>_<VersionNumber>-<DebianRevisionNumber>_<DebianArchitecture>.deb
-
-##########################################################
-#                       Components                       #
-##########################################################
 
 set(CPACK_COMPONENTS_ALL
 	Runtime
 	Development
 	Documentation
 )
-
-set(CPACK_DEBIAN_RUNTIME_PACKAGE_NAME "libuseful")
-set(CPACK_DEBIAN_RUNTIME_DESCRIPTION "Long-winded description to show in `apt show`")
-set(CPACK_DEBIAN_RUNTIME_FILE_NAME "${CPACK_DEBIAN_RUNTIME_PACKAGE_NAME}_${PACKAGE_VERSION_REVISION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
-set(CPACK_DEBIAN_RUNTIME_PACKAGE_SECTION "libs")
-set(CPACK_DEBIAN_RUNTIME_PACKAGE_DEPENDS "libstdc++")
-set(CPACK_DEBIAN_RUNTIME_PACKAGE_SUGGESTS "")
-set(CPACK_DEBIAN_RUNTIME_PACKAGE_CONFLICTS "")
-set(CPACK_DEBIAN_RUNTIME_PACKAGE_REPLACES "")
-set(CPACK_DEBIAN_RUNTIME_PACKAGE_PROVIDES "")
-
 set(CPACK_COMPONENT_DEVELOPMENT_DEPENDS Runtime)
-set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_NAME "libuseful-dev")
-set(CPACK_DEBIAN_DEVELOPMENT_FILE_NAME "${CPACK_DEBIAN_DEVELOPMENT_PACKAGE_NAME}_${PACKAGE_VERSION_REVISION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
-set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_SECTION "libdevel")
-set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_DEPENDS "libstdc++-dev")
-set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_RECOMMENDS "")
-set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_CONFLICTS "")
-set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_BREAKS "")
-set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_REPLACES "")
-set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_PROVIDES "")
-set(CPACK_DEBIAN_DEVELOPMENT_DESCRIPTION "Long-winded description to show in `apt show`")
 
-set(CPACK_DEBIAN_DOCUMENTATION_PACKAGE_NAME "libuseful-doc")
-set(CPACK_DEBIAN_DOCUMENTATION_FILE_NAME "${CPACK_DEBIAN_DOCUMENTATION_PACKAGE_NAME}_${PACKAGE_VERSION_REVISION}.deb")
-set(CPACK_DEBIAN_DOCUMENTATION_PACKAGE_DEPENDS "")
-set(CPACK_DEBIAN_DOCUMENTATION_PACKAGE_SECTION "admin")
-set(CPACK_DEBIAN_DOCUMENTATION_PACKAGE_CONFLICTS "")
-set(CPACK_DEBIAN_DOCUMENTATION_PACKAGE_REPLACES "")
-set(CPACK_DEBIAN_DOCUMENTATION_PACKAGE_PROVIDES "")
-set(CPACK_DEBIAN_DOCUMENTATION_DESCRIPTION "Long-winded description to show in `apt show`")
+set(CPACK_SOURCE_IGNORE_FILES [[/\\.git/;/\\.gitignore;/\\.vscode/;/\\.vs/;/build/;/install/;/package/]])
 
-set(CPACK_DEBIAN_PACKAGE_NAME "libuseful-src")
-set(CPACK_DEBIAN_FILE_NAME "${CPACK_DEBIAN_PACKAGE_NAME}_${PACKAGE_VERSION_REVISION}.deb")
+set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_SOURCE_DIR}/cmake/ProjectOwnerPackageConfig.cmake")
+
+if("DEB" IN_LIST CPACK_GENERATOR)
+	include(cmake/ProjectOwnerPackagingDEB.cmake)
+endif()
 
 include(CPack)

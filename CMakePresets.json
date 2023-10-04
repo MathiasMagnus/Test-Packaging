@@ -13,11 +13,19 @@
 			"installDir": "${sourceDir}/install"
 		},
 		{
-			"name": "packaging-ci",
+			"name": "packaging-ci-linux",
 			"hidden": true,
 			"cacheVariables": {
 				"CPACK_SOURCE_GENERATOR": "TGZ;DEB",
 				"CPACK_GENERATOR": "TGZ;DEB"
+			}
+		},
+		{
+			"name": "packaging-ci-windows",
+			"hidden": true,
+			"cacheVariables": {
+				"CPACK_SOURCE_GENERATOR": "ZIP",
+				"CPACK_GENERATOR": "ZIP"
 			}
 		},
 		{
@@ -32,7 +40,19 @@
 			}
 		},
 		{
-			"name": "toolchain-makefiles-c++-gcc-ci-linux",
+			"name": "generator-msbuild-ci",
+			"hidden": true,
+			"generator": "Visual Studio 17 2022",
+			"architecture": {
+				"value": "x64",
+				"strategy": "set"
+			},
+			"environment": {
+				"UseMultiToolTask": "true"
+			}
+		},
+		{
+			"name": "toolchain-makefiles-c++-gcc-ci",
 			"hidden": true,
 			"cacheVariables": {
 				"CMAKE_CXX_COMPILER": {
@@ -42,10 +62,28 @@
 			}
 		},
 		{
-			"name": "gcc-c++-strict-iso-high-warn-ci",
+			"name": "toolchain-msbuild-c++-msvc-ci",
+			"hidden": true,
+			"toolset": {
+				"value": "v143,host=x64",
+				"strategy": "set"
+			},
+			"cacheVariables": {
+				"CMAKE_CXX_COMPILER": "cl.exe"
+			}
+		},
+		{
+			"name": "gcc-c++-strict-iso-high-warn-as-error-ci",
 			"hidden": true,
 			"cacheVariables": {
 				"CMAKE_CXX_FLAGS": "-pedantic -Wall -Wextra -Werror"
+			}
+		},
+		{
+			"name": "msvc-c++-strict-iso-high-warn-as-error-ci",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_CXX_FLAGS": "/EHsc /permissive- /W4 /WX"
 			}
 		},
 		{
@@ -53,15 +91,37 @@
 			"displayName": "Ninja Multi-Config & GCC",
 			"inherits": [
 				"layout-ci",
-				"packaging-ci",
+				"packaging-ci-linux",
 				"generator-ninja-multi-config-ci",
-				"toolchain-makefiles-c++-gcc-ci-linux",
-				"gcc-c++-strict-iso-high-warn-ci"
+				"toolchain-makefiles-c++-gcc-ci",
+				"gcc-c++-strict-iso-high-warn-as-error-ci"
 			],
 			"condition": {
 				"type": "equals",
 				"lhs": "${hostSystemName}",
 				"rhs": "Linux"
+			},
+			"errors": {
+				"dev": true
+			},
+			"cacheVariables": {
+				"BUILD_SHARED_LIBS": true
+			}
+		},
+		{
+			"name": "msbuild-ci-windows",
+			"displayName": "MSBuild & MSVC",
+			"inherits": [
+				"layout-ci",
+				"packaging-ci-windows",
+				"generator-msbuild-ci",
+				"toolchain-msbuild-c++-msvc-ci",
+				"msvc-c++-strict-iso-high-warn-as-error-ci"
+			],
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
 			},
 			"errors": {
 				"dev": true
@@ -86,7 +146,7 @@
 		},
 		{
 			"name": "ninja-mc-ci-linux-debug-install",
-			"displayName": "Debug",
+			"displayName": "Debug (install)",
 			"configuration": "Debug",
 			"configurePreset": "ninja-mc-ci-linux",
 			"targets": [
@@ -95,9 +155,39 @@
 		},
 		{
 			"name": "ninja-mc-ci-linux-release-install",
-			"displayName": "Release",
+			"displayName": "Release (install)",
 			"configuration": "Release",
 			"configurePreset": "ninja-mc-ci-linux",
+			"targets": [
+				"install"
+			]
+		},
+		{
+			"name": "msbuild-ci-windows-debug",
+			"displayName": "Debug",
+			"configuration": "Debug",
+			"configurePreset": "msbuild-ci-windows"
+		},
+		{
+			"name": "msbuild-ci-windows-release",
+			"displayName": "Release",
+			"configuration": "Release",
+			"configurePreset": "msbuild-ci-windows"
+		},
+		{
+			"name": "msbuild-ci-windows-debug-install",
+			"displayName": "Debug (Install)",
+			"configuration": "Debug",
+			"configurePreset": "msbuild-ci-windows",
+			"targets": [
+				"install"
+			]
+		},
+		{
+			"name": "msbuild-ci-windows-release-install",
+			"displayName": "Release (Install)",
+			"configuration": "Release",
+			"configurePreset": "msbuild-ci-windows",
 			"targets": [
 				"install"
 			]
@@ -110,7 +200,7 @@
 			"execution": {
 				"noTestsAction": "error",
 				"stopOnFailure": true,
-				"jobs": 4
+				"jobs": 3
 			},
 			"output": {
 				"outputOnFailure": true
@@ -130,6 +220,24 @@
 			"displayName": "Release",
 			"configuration": "Release",
 			"configurePreset": "ninja-mc-ci-linux",
+			"inherits": [
+				"execution-behavior-ci"
+			]
+		},
+		{
+			"name": "msbuild-ci-windows-debug",
+			"displayName": "Debug",
+			"configuration": "Debug",
+			"configurePreset": "msbuild-ci-windows",
+			"inherits": [
+				"execution-behavior-ci"
+			]
+		},
+		{
+			"name": "msbuild-ci-windows-release",
+			"displayName": "Release",
+			"configuration": "Release",
+			"configurePreset": "msbuild-ci-windows",
 			"inherits": [
 				"execution-behavior-ci"
 			]
@@ -184,6 +292,38 @@
 			},
 			"configFile": "${sourceDir}/build/CPackSourceConfig.cmake",
 			"packageDirectory": "${sourceDir}/package"
+		},
+		{
+			"name": "msbuild-ci-windows-binary-zip",
+			"displayName": "Binary (ZIP)",
+			"configurePreset": "msbuild-ci-windows",
+			"configurations": [
+				"Release"
+			],
+			"generators": [
+				"ZIP"
+			],
+			"variables": {
+				"CPACK_PACKAGING_INSTALL_PREFIX": ""
+			},
+			"configFile": "${sourceDir}/build/CPackConfig.cmake",
+			"packageDirectory": "${sourceDir}/package"
+		},
+		{
+			"name": "msbuild-ci-windows-source-zip",
+			"displayName": "Source (ZIP)",
+			"configurePreset": "msbuild-ci-windows",
+			"configurations": [
+				"Release"
+			],
+			"generators": [
+				"ZIP"
+			],
+			"variables": {
+				"CPACK_PACKAGING_INSTALL_PREFIX": ""
+			},
+			"configFile": "${sourceDir}/build/CPackSourceConfig.cmake",
+			"packageDirectory": "${sourceDir}/package"
 		}
 	],
 	"workflowPresets": [
@@ -226,6 +366,44 @@
 				{
 					"type": "package",
 					"name": "ninja-mc-ci-linux-source-tgz"
+				}
+			]
+		},
+		{
+			"name": "msbuild-ci-windows",
+			"displayName": "MSBuild & MSVC",
+			"steps": [
+				{
+					"type": "configure",
+					"name": "msbuild-ci-windows"
+				},
+				{
+					"type": "build",
+					"name": "msbuild-ci-windows-release"
+				},
+				{
+					"type": "build",
+					"name": "msbuild-ci-windows-debug"
+				},
+				{
+					"type": "test",
+					"name": "msbuild-ci-windows-release"
+				},
+				{
+					"type": "test",
+					"name": "msbuild-ci-windows-debug"
+				},
+				{
+					"type": "build",
+					"name": "msbuild-ci-windows-release-install"
+				},
+				{
+					"type": "package",
+					"name": "msbuild-ci-windows-binary-zip"
+				},
+				{
+					"type": "package",
+					"name": "msbuild-ci-windows-source-zip"
 				}
 			]
 		}
