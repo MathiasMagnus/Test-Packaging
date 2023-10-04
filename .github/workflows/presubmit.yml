@@ -1,0 +1,40 @@
+name: Presubmit
+
+on: [push, pull_request]
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Obtain CMake 3.25.x
+      uses: lukka/get-cmake
+      with:
+        cmakeVersion: "~3.25.0"  # use most recent 3.25.x version
+
+    - name: Git clone repository
+      uses: actions/checkout@v3
+
+    - name: Configure
+      run: cmake --workflow ninja-mc-ci-linux
+
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+    - name: Obtain CMake 3.25.x
+      uses: lukka/get-cmake
+      with:
+        cmakeVersion: "~3.25.0"  # use most recent 3.25.x version
+
+    - name: Git clone repository
+      uses: actions/checkout@v3
+
+    - name: Configure
+      run: cmake --workflow msbuild-ci-windows
