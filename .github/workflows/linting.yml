@@ -14,3 +14,11 @@ jobs:
     - name: Pretends to run clang-format
       shell: pwsh
       run: Write-Host 'Checked if formatting was okay and all was fine!'
+
+  clang-tidy:
+    name: ClangTidy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Pretends to run clang-tidy
+      shell: pwsh
+      run: Write-Host 'Checked if everything is as tidy as they ought to!'
