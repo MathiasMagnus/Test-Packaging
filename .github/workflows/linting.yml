@@ -1,4 +1,4 @@
-name: Formatting
+name: Linting
 
 on:
   workflow_call:
@@ -7,9 +7,10 @@ permissions:
   contents: read
 
 jobs:
-  format:
+  clang-format:
+    name: ClangFormat
     runs-on: ubuntu-latest
     steps:
-    - name: Pretends to format
+    - name: Pretends to run clang-format
       shell: pwsh
       run: Write-Host 'Checked if formatting was okay and all was fine!'
