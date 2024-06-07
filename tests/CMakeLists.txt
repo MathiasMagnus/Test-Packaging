@@ -12,5 +12,6 @@ foreach(TEST_STRING
 	set_tests_properties("${TEST_STRING}"
 		PROPERTIES
 			PASS_REGULAR_EXPRESSION "${UPPERCASE_TEST_STRING}"
+			LABELS "Basic"
 	)
 endforeach()

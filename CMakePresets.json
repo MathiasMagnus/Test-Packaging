@@ -203,7 +203,8 @@
 				"jobs": 3
 			},
 			"output": {
-				"outputOnFailure": true
+				"outputOnFailure": true,
+				"outputJUnitFile": "${sourceDir}/build/${presetName}-junit.xml"
 			}
 		},
 		{
