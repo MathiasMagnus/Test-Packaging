@@ -19,7 +19,7 @@ jobs:
         cmakeVersion: "~3.25.0"  # use most recent 3.25.x version
 
     - name: Git clone repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Run CMake workflow preset
       run: cmake --workflow --preset ninja-mc-ci-linux
@@ -38,7 +38,7 @@ jobs:
         cmakeVersion: "~3.25.0"  # use most recent 3.25.x version
 
     - name: Git clone repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Run CMake workflow preset
       run: cmake --workflow --preset msbuild-ci-windows
