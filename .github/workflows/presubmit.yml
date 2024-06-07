@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 jobs:
   formatting:
+    name: Formatting
     uses: ./.github/workflows/formatting.yml
   linux:
     needs: formatting
