@@ -1,0 +1,15 @@
+name: Formatting
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Pretends to format
+      shell: pwsh
+      run: Write-Host 'Checked if formatting was okay and all was fine!'

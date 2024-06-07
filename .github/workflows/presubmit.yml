@@ -3,7 +3,10 @@ name: Presubmit
 on: [push, pull_request]
 
 jobs:
+  formatting:
+    uses: ./.github/workflows/formatting.yml
   linux:
+    needs: formatting
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -22,6 +25,7 @@ jobs:
       run: cmake --workflow --preset ninja-mc-ci-linux
 
   windows:
+    needs: formatting
     runs-on: windows-latest
     defaults:
       run:
